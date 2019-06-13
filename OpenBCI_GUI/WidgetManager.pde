@@ -28,11 +28,16 @@ W_AnalogRead w_analogRead;
 W_DigitalRead w_digitalRead;
 W_MarkerMode w_markermode;
 W_playback w_playback;
-
+W_Gastric w_gastric;
 
 //ADD YOUR WIDGET TO WIDGETS OF WIDGETMANAGER
 void setupWidgets(PApplet _this, ArrayList<Widget> w){
     // println("  setupWidgets start -- " + millis());
+
+    //Widget_0
+    w_gastric = new W_Gastric(_this);
+    w_gastric.setTitle("Gastric");
+    addWidget(w_gastric, w);
 
     //Widget_0
     w_timeSeries = new W_timeSeries(_this);
