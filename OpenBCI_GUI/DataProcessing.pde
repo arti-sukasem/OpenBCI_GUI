@@ -326,7 +326,7 @@ int getPlaybackDataFromTable(Table datatable, int currentTableRowIndex, float sc
 class DataProcessing {
     private float fs_Hz;  //sample rate
     private int nchan;
-    final int N_FILT_CONFIGS = 5;
+    final int N_FILT_CONFIGS = 6;
     FilterConstants[] filtCoeff_bp = new FilterConstants[N_FILT_CONFIGS];
     final int N_NOTCH_CONFIGS = 3;
     FilterConstants[] filtCoeff_notch = new FilterConstants[N_NOTCH_CONFIGS];
@@ -623,14 +623,16 @@ class DataProcessing {
                             a = new double[] { 1.0 };
                     }
                     filt_txt = "Bandpass 0-10Hz";
-                    short_txt = "0-10 Hz";
+                    short_txt = "0-0.5 Hz";
                     break;
-                default:
+                case 5:
                     //no filtering
                     b = new double[] { 1.0 };
                     a = new double[] { 1.0 };
                     filt_txt = "No BP Filter";
-                    short_txt = "No Filter";
+                    short_txt = "None";
+                    break;
+
                 }  //end switch block
 
                 //create the bandpass filter
