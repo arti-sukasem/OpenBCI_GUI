@@ -632,6 +632,13 @@ class DataProcessing {
                     filt_txt = "No BP Filter";
                     short_txt = "None";
                     break;
+                default:
+                    //no filtering
+                    b = new double[] { 1.0 };
+                    a = new double[] { 1.0 };
+                    filt_txt = "No BP Filter";
+                    short_txt = "None";
+                    break;
                 }  //end switch block
 
                 //create the bandpass filter
