@@ -451,6 +451,48 @@ class DataProcessing {
                 //define bandpass filter
                 switch (Ifilt) {
                 case 0:
+                    //no filtering
+                    b = new double[] { 1.0 };
+                    a = new double[] { 1.0 };
+                    filt_txt = "No BP Filter";
+                    short_txt = "None";
+                break;
+                case 1:
+                    //0 - 0.5 Hz band pass filter, 2nd Order Butterworth: [b, a] = butter(2,[0.0 0.5]/(fs_Hz / 2.0))
+                    switch(int(fs_Hz)) {
+                        case 125:
+                            b = new double[] { 0.000155148423475721,   0.000310296846951441,    0.000155148423475721 };
+                            a = new double[] { 1.0, -1.96446058020523, 0.965081173899135 };
+                            break;
+                        case 200:
+                            b = new double[] { 0.0000610061787580662,   0.000122012357516132,   0.0000610061787580662 };
+                            a = new double[] { 1.0, -1.97778648377676, 0.978030508491796 };
+                            break;
+                        case 250:
+                            b = new double[] { 0.0000391302053991682,  0.0000782604107983365,   0.0000391302053991682 };
+                            a = new double[] { 1.0, -1.98222892979253, 0.982385450614126 };
+                            break;
+                        case 500:
+                            b = new double[] { 0.00000982591682047174,  0.0000196518336409435,  0.00000982591682047174 };
+                            a = new double[] { 1.0, -1.99111429220165, 0.991153595868935 };
+                            break;
+                        case 1000:
+                            b = new double[] { 0.00000246193004641015, 0.00000492386009282031,  0.00000246193004641015 };
+                            a = new double[] { 1.0, -1.99555712434579, 0.995566972065975 };
+                            break;
+                        case 1600:
+                            b = new double[] { 0.000000962491921330244, 0.00000192498384266049, 0.000000962491921330244 };
+                            a = new double[] { 1.0, -1.99722319994418, 0.997227049911866 };
+                        break;
+                        default:
+                            println("EEG_Processing: *** ERROR *** Filters can only work at 125Hz, 200Hz, 250 Hz, 1000Hz or 1600Hz");
+                            b = new double[] { 1.0 };
+                            a = new double[] { 1.0 };
+                    }
+                    filt_txt = "Bandpass 0-0.5Hz";
+                    short_txt = "0-0.5 Hz";
+                    break;
+                case 2:
                     //1-50 Hz band pass filter, 2nd Order Butterworth: [b, a] = butter(2,[1.0 50.0]/(fs_Hz / 2.0))
                     switch(int(fs_Hz)) {
                         case 125:
@@ -485,7 +527,7 @@ class DataProcessing {
                     filt_txt = "Bandpass 1-50Hz";
                     short_txt = "1-50 Hz";
                     break;
-                case 1:
+                case 3:
                     //7-13 Hz band pass filter, 2nd Order Butterworth: [b, a] = butter(2,[7.0 13.0]/(fs_Hz / 2.0))
                     switch(int(fs_Hz)) {
                         case 125:
@@ -520,7 +562,7 @@ class DataProcessing {
                     filt_txt = "Bandpass 7-13Hz";
                     short_txt = "7-13 Hz";
                     break;
-                case 2:
+                case 4:
                     //15-50 Hz band pass filter, 2nd Order Butterworth: [b, a] = butter(2,[15.0 50.0]/(fs_Hz / 2.0))
                     switch(int(fs_Hz)) {
                         case 125:
@@ -555,7 +597,7 @@ class DataProcessing {
                     filt_txt = "Bandpass 15-50Hz";
                     short_txt = "15-50 Hz";
                     break;
-                case 3:
+                case 5:
                     //5-50 Hz band pass filter, 2nd Order Butterworth: [b, a] = butter(2,[5.0 50.0]/(fs_Hz / 2.0))
                     switch(int(fs_Hz)) {
                         case 125:
@@ -590,55 +632,12 @@ class DataProcessing {
                     filt_txt = "Bandpass 5-50Hz";
                     short_txt = "5-50 Hz";
                     break;
-                case 4:
-                    //0 - 0.5 Hz band pass filter, 2nd Order Butterworth: [b, a] = butter(2,[0.0 0.5]/(fs_Hz / 2.0))
-                    switch(int(fs_Hz)) {
-                        case 125:
-                            b = new double[] { 0.0000015763344880515, 0.000003152668976103, 0.0000015763344880515 };
-                            a = new double[] { 1.0, -1.99644569738134, 0.996452002719291 };
-                            break;
-                        case 200:
-                            b = new double[] { 0.000000616165760441989,   0.00000123233152088398,   0.000000616165760441989 };
-                            a = new double[] { 1.0, -1.99777855944293, 0.997781024105973 };
-                            break;
-                        case 250:
-                            b = new double[] { 0.00000039443363969438,  0.000000788867279388761,    0.00000039443363969438 };
-                            a = new double[] { 1.0, -1.99822284729184, 0.998224425026401 };
-                            break;
-                        case 500:
-                            b = new double[] { 0.0000000986522107337962,  0.000000197304421467592,  0.0000000986522107337962 };
-                            a = new double[] { 1.0,  -1.9991114234708, 0.999111818079639 };
-                            break;
-                        case 1000:
-                            b = new double[] { 0.0000000246685308291639, 0.0000000493370616583277,  0.0000000246685308291639 };
-                            a = new double[] { 1.0, -1.99955571171349, 0.999555810387613 };
-                            break;
-                        case 1600:
-                            b = new double[] { 0.00000000963694754552158, 0.0000000192738950910432, 0.00000000963694754552158 };
-                            a = new double[] { 1.0, -1.99972231981815, 0.999722358365939 };
-                            break;
-                        default:
-                            println("EEG_Processing: *** ERROR *** Filters can only work at 125Hz, 200Hz, 250 Hz, 1000Hz or 1600Hz");
-                            b = new double[] { 1.0 };
-                            a = new double[] { 1.0 };
-                    }
-                    filt_txt = "Bandpass 0-0.5Hz";
-                    short_txt = "0-0.5 Hz";
-                    break;
-                case 5:
-                    //no filtering
-                    b = new double[] { 1.0 };
-                    a = new double[] { 1.0 };
-                    filt_txt = "No BP Filter";
-                    short_txt = "None";
-                    break;
                 default:
-                    //no filtering
+                    //no filtering 
                     b = new double[] { 1.0 };
                     a = new double[] { 1.0 };
                     filt_txt = "No BP Filter";
                     short_txt = "None";
-                    break;
                 }  //end switch block
 
                 //create the bandpass filter

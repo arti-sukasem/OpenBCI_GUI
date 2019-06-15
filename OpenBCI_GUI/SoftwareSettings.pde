@@ -108,7 +108,7 @@ class SoftwareSettings {
 
     //Used to set text for Notch and BP filter settings
     String [] dataProcessingNotchArray = {"60Hz", "50Hz", "None"};
-    String [] dataProcessingBPArray = {"1-50 Hz", "7-13 Hz", "15-50 Hz", "5-50 Hz", "No Filter"};
+    String [] dataProcessingBPArray = {"0-0.5 Hz", "1-50 Hz", "7-13 Hz", "15-50 Hz", "5-50 Hz", "No Filter"};
 
     // Used to set text in Time Series dropdown settings
     String[] tsVertScaleArray = {"Auto", "50 uV", "100 uV", "200 uV", "400 uV", "1000 uV", "10000 uV"};
@@ -123,7 +123,7 @@ class SoftwareSettings {
     String[] srb1SettingArray = {"Off", "On"};
 
     //Used to set text in dropdown menus when loading FFT settings
-    String[] fftMaxFrqArray = {"20 Hz", "40 Hz", "60 Hz", "100 Hz", "120 Hz", "250 Hz", "500 Hz", "800 Hz"};
+    String[] fftMaxFrqArray = {"1 Hz","5 Hz","10 Hz","20 Hz", "40 Hz", "60 Hz", "100 Hz", "120 Hz", "250 Hz", "500 Hz", "800 Hz"};
     String[] fftVertScaleArray = {"10 uV", "50 uV", "100 uV", "1000 uV"};
     String[] fftLogLinArray = {"Log", "Linear"};
     String[] fftSmoothingArray = {"0.0", "0.5", "0.75", "0.9", "0.95", "0.98"};
