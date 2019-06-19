@@ -21,6 +21,7 @@ class TopNav {
     Button debugButton;
 
     Button stopButton;
+    Button stopButtonGlimpse;
 
     Button filtBPButton;
     Button filtNotchButton;
@@ -123,18 +124,24 @@ class TopNav {
     }
 
     void initSecondaryNav() {
-        stopButton = new Button(3, 35, 170, 26, stopButton_pressToStart_txt, fontInfo.buttonLabel_size);
+        stopButton = new Button(7 + 150 , 35, 170, 26, stopButton_pressToStart_txt, fontInfo.buttonLabel_size);
         stopButton.setFont(h4, 14);
         stopButton.setColorNotPressed(color(184, 220, 105));
         stopButton.setHelpText("Press this button to Stop/Start the data stream. Or press <SPACEBAR>");
 
-        filtNotchButton = new Button(7 + stopButton.but_dx, 35, 70, 26, "Notch\n" + dataProcessing.getShortNotchDescription(), fontInfo.buttonLabel_size);
+        filtNotchButton = new Button(11 + stopButton.but_dx + 150, 35, 70, 26, "Notch\n" + dataProcessing.getShortNotchDescription(), fontInfo.buttonLabel_size);
         filtNotchButton.setFont(p5, 12);
         filtNotchButton.setHelpText("Here you can adjust the Notch Filter that is applied to all \"Filtered\" data.");
 
-        filtBPButton = new Button(11 + stopButton.but_dx + 70, 35, 70, 26, "BP Filt\n" + dataProcessing.getShortFilterDescription(), fontInfo.buttonLabel_size);
+        filtBPButton = new Button(15 + stopButton.but_dx + 220, 35, 70, 26, "BP Filt\n" + dataProcessing.getShortFilterDescription(), fontInfo.buttonLabel_size);
         filtBPButton.setFont(p5, 12);
         filtBPButton.setHelpText("Here you can adjust the Band Pass Filter that is applied to all \"Filtered\" data.");
+        
+        stopButtonGlimpse = new Button(3, 35, 150, 26, stopButton_pressToStartGlimpse_txt, fontInfo.buttonLabel_size);
+        stopButtonGlimpse.setFont(h4, 14);
+        stopButtonGlimpse.setColorNotPressed(color(184, 220, 105));
+        stopButtonGlimpse.setHelpText("Press this button to Stop/Start the data glimpse.");
+
 
         //right to left in top right (secondary nav)
         layoutButton = new Button(width - 3 - 60, 35, 60, 26, "Layout", fontInfo.buttonLabel_size);
@@ -259,6 +266,7 @@ class TopNav {
 
         if (systemMode == SYSTEMMODE_POSTINIT) {
             stopButton.draw();
+            stopButtonGlimpse.draw();
             filtBPButton.draw();
             filtNotchButton.draw();
             layoutButton.draw();
@@ -305,6 +313,10 @@ class TopNav {
             if (stopButton.isMouseHere()) {
                 stopButton.setIsActive(true);
                 stopButtonWasPressed();
+            }
+            if (stopButtonGlimpse.isMouseHere()) {
+                stopButtonGlimpse.setIsActive(true);
+                stopButtonGlimpseWasPressed();
             }
             if (filtBPButton.isMouseHere()) {
                 filtBPButton.setIsActive(true);
@@ -422,6 +434,7 @@ class TopNav {
                 }
             }
             stopButton.setIsActive(false);
+            stopButtonGlimpse.setIsActive(false);
             filtBPButton.setIsActive(false);
             filtNotchButton.setIsActive(false);
             layoutButton.setIsActive(false);

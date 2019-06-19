@@ -192,6 +192,7 @@ PlotFontInfo fontInfo;
 
 //program variables
 boolean isRunning = false;
+boolean isRunning_Glimpse = false;
 boolean redrawScreenNow = true;
 int openBCI_byteCount = 0;
 StringBuilder board_message;
@@ -263,8 +264,10 @@ PApplet ourApplet;
 static CustomOutputStream outputStream;
 
 //Variables from TopNav.pde. Used to set text when stopping/starting data stream.
-public final static String stopButton_pressToStop_txt = "Stop Data Stream";
-public final static String stopButton_pressToStart_txt = "Start Data Stream";
+public final static String stopButton_pressToStop_txt = "Stop Streaming";
+public final static String stopButton_pressToStopGlimpse_txt = "Stop Glimpsing";
+public final static String stopButton_pressToStartGlimpse_txt = "Start Glimpsing";
+public final static String stopButton_pressToStart_txt = "Start Data Streaming";
 
 ///////////Variables from HardwareSettingsController. This fixes a number of issues.
 int numSettingsPerChannel = 6; //each channel has 6 different settings
@@ -583,7 +586,7 @@ void killRunningProcessMac() {
                     endProcess(getProcessIdFromLineMac(line));
                     println("Killed: " + line);
                 }
-                catch (Exception err) {
+                catch (Exception err) { 
                     println("Failed to stop process: " + line + "\n\n");
                     err.printStackTrace();
                 }
@@ -876,6 +879,23 @@ void initFFTObjectsAndBuffer() {
     }
 }
 
+void startRunningGlimpse() {
+    verbosePrint("startRunning...");
+    output("Data Glimpse started.");
+    if (eegDataSource == DATASOURCE_GANGLION) {
+        if (ganglion != null) {
+            ganglion.startDataTransferGlimpse();
+        }
+    } else if (eegDataSource == DATASOURCE_CYTON) {
+        if (cyton != null) {
+            cyton.startDataTransferGlimpse();
+        }
+    }
+    isRunning = true;
+    isRunning_Glimpse = true;
+    
+}
+
 void startRunning() {
     verbosePrint("startRunning...");
     output("Data stream started.");
@@ -889,6 +909,31 @@ void startRunning() {
         }
     }
     isRunning = true;
+    
+}
+
+void stopRunningGlimpse() {
+    // openBCI.changeState(0); //make sure it's no longer interpretting as binary
+    verbosePrint("OpenBCI_GUI: stopRunningGlimpse: stop running...");
+    if (isRunning) {
+        output("Data glimpse stopped.");
+    }
+    if (eegDataSource == DATASOURCE_GANGLION) {
+        if (ganglion != null) {
+            ganglion.stopDataTransferGlimpse();
+        }
+    } else {
+        if (cyton != null) {
+            cyton.stopDataTransferGlimpse();
+        }
+    }
+    isRunning = false;
+    isRunning_Glimpse = false;
+    
+
+    // openBCI.changeState(0); //make sure it's no longer interpretting as binary
+    // systemMode = 0;
+    // closeLogFile();
 }
 
 void stopRunning() {
@@ -908,18 +953,21 @@ void stopRunning() {
     }
 
     isRunning = false;
+
     // openBCI.changeState(0); //make sure it's no longer interpretting as binary
     // systemMode = 0;
     // closeLogFile();
 }
 
-//execute this function whenver the stop button is pressed
-void stopButtonWasPressed() {
+//execute this function whenver the stop button (Glimpse) is pressed
+void stopButtonGlimpseWasPressed() {
     //toggle the data transfer state of the ADS1299...stop it or start it...
-    if (isRunning) {
-        verbosePrint("openBCI_GUI: stopButton was pressed...stopping data transfer...");
+    if (isRunning_Glimpse) {
+        verbosePrint("openBCI_GUI: GlimpseButton (Stop) was pressed...stopping data Glimpse...");
         wm.setUpdating(false);
-        stopRunning();
+        stopRunningGlimpse();
+        topNav.stopButtonGlimpse.setString(stopButton_pressToStartGlimpse_txt);
+        topNav.stopButtonGlimpse.setColorNotPressed(color(184, 220, 105));
         topNav.stopButton.setString(stopButton_pressToStart_txt);
         topNav.stopButton.setColorNotPressed(color(184, 220, 105));
         if (eegDataSource == DATASOURCE_GANGLION && ganglion.isCheckingImpedance()) {
@@ -927,8 +975,47 @@ void stopButtonWasPressed() {
             w_ganglionImpedance.startStopCheck.but_txt = "Start Impedance Check";
         }
     } else { //not running
+        verbosePrint("openBCI_GUI: GlimpseButton (Start) was pressed...starting data transfer...");
+        wm.setUpdating(true);
+        // Clear plots when start button is pressed in playback mode
+        if (eegDataSource == DATASOURCE_PLAYBACKFILE) {
+            clearAllTimeSeriesGPlots();
+            clearAllAccelGPlots();
+        }
+        startRunningGlimpse();
+        topNav.stopButtonGlimpse.setString(stopButton_pressToStopGlimpse_txt);
+        topNav.stopButtonGlimpse.setColorNotPressed(color(224, 56, 45));
+        topNav.stopButton.setString(stopButton_pressToStart_txt);
+        topNav.stopButton.setColorNotPressed(color(184, 220, 105));
+        nextPlayback_millis = millis();  //used for synthesizeData and readFromFile.  This restarts the clock that keeps the playback at the right pace.
+        if (eegDataSource == DATASOURCE_GANGLION && ganglion.isCheckingImpedance()) {
+            ganglion.impedanceStop();
+            w_ganglionImpedance.startStopCheck.but_txt = "Start Impedance Check";
+        }
+    }
+}
+
+//execute this function whenver the stop button is pressed
+void stopButtonWasPressed() {
+    //toggle the data transfer state of the ADS1299...stop it or start it...
+    if (isRunning && isRunning_Glimpse == false ) {
+        verbosePrint("openBCI_GUI: stopButton was pressed...stopping data transfer...");
+        wm.setUpdating(false);
+        stopRunning();
+        topNav.stopButton.setString(stopButton_pressToStart_txt);
+        topNav.stopButton.setColorNotPressed(color(184, 220, 105));
+        startRunningGlimpse();
+        topNav.stopButtonGlimpse.setString(stopButton_pressToStopGlimpse_txt);
+        topNav.stopButtonGlimpse.setColorNotPressed(color(224, 56, 45));
+        if (eegDataSource == DATASOURCE_GANGLION && ganglion.isCheckingImpedance()) {
+            ganglion.impedanceStop();
+            w_ganglionImpedance.startStopCheck.but_txt = "Start Impedance Check";
+        }
+    } else { //not running
         verbosePrint("openBCI_GUI: startButton was pressed...starting data transfer...");
         wm.setUpdating(true);
+        //Switch off the Glimpse Button (if on)
+        stopRunningGlimpse();
         // Clear plots when start button is pressed in playback mode
         if (eegDataSource == DATASOURCE_PLAYBACKFILE) {
             clearAllTimeSeriesGPlots();
@@ -1171,7 +1258,6 @@ void systemDraw() { //for drawing to the screen
             //if (drawLoop_counter >= drawLoopCounter_thresh) println("OpenBCI_GUI: redrawing based on loop counter...");
             drawLoop_counter=0; //reset for next time
             redrawScreenNow = false;  //reset for next time
-
             //update the title of the figure;
             switch (eegDataSource) {
             case DATASOURCE_CYTON:
@@ -1197,9 +1283,8 @@ void systemDraw() { //for drawing to the screen
             case DATASOURCE_GANGLION:
                 surface.setTitle(int(frameRate) + " fps, Ganglion!");
                 break;
-            }
         }
-
+        }
         //wait 1 second for GUI to reinitialize
         if ((millis() - timeOfGUIreinitialize) > reinitializeGUIdelay) {
             // println("attempting to draw GUI...");

@@ -687,7 +687,6 @@ class Hub {
                     //   werePacketsDroppedHub = false;
                     //   numPacketsDroppedHub = 0;
                     // }
-
                     switch (outputDataSource) {
                         case OUTPUT_SOURCE_ODF:
                             if (eegDataSource == DATASOURCE_GANGLION) {

@@ -223,6 +223,7 @@ public class OutputFile_rawtxt {
     }
 
     public void writeRawData_dataPacket(DataPacket_ADS1299 data, float scale_to_uV, float scale_for_aux, int stopByte, long timestamp) {
+        if (isRunning_Glimpse == false) { 
         //get current date time with Date()
         if (output != null) {
             output.print(Integer.toString(data.sampleIndex));
@@ -240,6 +241,7 @@ public class OutputFile_rawtxt {
             output.print( ", " + timestamp);
             output.println(); rowsWritten++;
             //output.flush();
+        }
         }
     }
 
@@ -529,7 +531,7 @@ public class OutputFile_BDF {
       * @param `data` {DataPacket_ADS1299} - A data packet
       */
     public void writeRawData_dataPacket(DataPacket_ADS1299 data) {
-
+    
         if (!startTimeCaptured) {
             startTime = new Date();
             startTimeCaptured = true;
@@ -594,8 +596,7 @@ public class OutputFile_BDF {
         }
     }
 
-    public void closeFile() {
-
+    public void closeFile() { 
         output("Closed the temp data file. Now opening a new file");
         try {
             dstream.close();
@@ -617,6 +618,7 @@ public class OutputFile_BDF {
         writeData(o);
         output("Data written. Closing new file.");
         println("closeFile: wrote data");
+
     }
 
     public int getRecordsWritten() {

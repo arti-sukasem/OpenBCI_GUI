@@ -150,6 +150,30 @@ class Ganglion {
         }
         return 0;
     }
+    
+    /**
+      * @description Sends a start streaming command to the Ganglion Node module.
+      */
+    void startDataTransferGlimpse(){
+        hub.changeState(HubState.NORMAL);  // make sure it's now interpretting as binary
+        println("Ganglion: startDataTransfer(): sending \'" + command_startBinary);
+        if (checkingImpedance) {
+            impedanceStop();
+            delay(100);
+            hub.sendCommand('b');
+        } else {
+            hub.sendCommand('b');
+        }
+    }
+
+    /**
+      * @description Sends a stop streaming command to the Ganglion Node module.
+      */
+    public void stopDataTransferGlimpse() {
+        hub.changeState(HubState.STOPPED);  // make sure it's now interpretting as binary
+        println("Ganglion: stopDataTransfer(): sending \'" + command_stop);
+        hub.sendCommand('s');
+    }
 
     /**
       * @description Sends a start streaming command to the Ganglion Node module.
