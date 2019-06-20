@@ -320,6 +320,7 @@ public class OutputFile_rawtxt {
 public class OutputFile_BDF {
     private PrintWriter writer;
     private OutputStream dstream;
+    private OutputStream o;
     // private FileOutputStream fstream;
     // private BufferedOutputStream bstream;
     // private DataOutputStream dstream;
@@ -531,7 +532,7 @@ public class OutputFile_BDF {
       * @param `data` {DataPacket_ADS1299} - A data packet
       */
     public void writeRawData_dataPacket(DataPacket_ADS1299 data) {
-    
+    if (isRunning_Glimpse == false) { 
         if (!startTimeCaptured) {
             startTime = new Date();
             startTimeCaptured = true;
@@ -554,8 +555,17 @@ public class OutputFile_BDF {
             writeDataOut();
         }
     }
+    }
 
     private void writeDataOut() {
+
+        //writing the header into the BDF file 
+        o = createOutput(fname);
+        writeHeader(o);
+        output("Header writen, now writing data.");
+        println("closeFile: wrote header");
+
+        //Recording into text files (temp.txt)
         try {
             for (int i = 0; i < nbChan; i++) {
                 for (int j = 0; j < fs_Hz; j++) {
@@ -589,7 +599,8 @@ public class OutputFile_BDF {
                 dstream.write(0);
             }
             dataRecordsWritten++;
-
+            //Converting text.file into BDF file at the same time with temp.txt
+            writeData_BDF(o);
         } catch (Exception e) {
             println("writeRawData_dataPacket: Exception ");
             e.printStackTrace();
@@ -597,28 +608,25 @@ public class OutputFile_BDF {
     }
 
     public void closeFile() { 
-        output("Closed the temp data file. Now opening a new file");
+        //Close text.file (temp.text) when Stop System is pressed
+        output("Closed the temp data file.");
         try {
             dstream.close();
         } catch (Exception e) {
             println("closeFile: dstream close exception ");
             e.printStackTrace();
         }
+
+        //Close BDF.file when Stop System is pressed
+        output("Closed the BDF data file.");
+        try {
+            o.close();
+        } catch (Exception e) {
+            println("closeFile: o close exception ");
+            e.printStackTrace();
+        }
         println("closeFile: started...");
-
-        OutputStream o = createOutput(fname);
-        println("closeFile: made file");
-
-        // Create a new writer with the same file name
-        // Write the header
-        writeHeader(o);
-        output("Header writen, now writing data.");
-        println("closeFile: wrote header");
-
-        writeData(o);
-        output("Data written. Closing new file.");
-        println("closeFile: wrote data");
-
+            
     }
 
     public int getRecordsWritten() {
@@ -1165,10 +1173,8 @@ public class OutputFile_BDF {
       *  TODO: Stop keeping it in memory.
       * @param `o` {OutputStream} - An output stream to write to.
       */
-    private void writeData(OutputStream o) {
-
+    public void writeData_BDF(OutputStream o) {
         InputStream input = createInput(tempWriterPrefix);
-
         try {
             println("writeData: started...");
             int data = input.read();
@@ -1183,16 +1189,9 @@ public class OutputFile_BDF {
         catch (IOException e) {
             print("writeData: ");
             e.printStackTrace();
-        }
-        finally {
-            try {
-                input.close();
-            }
-            catch (IOException e) {
-                print("writeData: ");
-                e.printStackTrace();
-            }
-        }
+        } 
+
+        
     }
 
     /**
